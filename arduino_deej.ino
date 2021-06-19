@@ -4,21 +4,28 @@
 #include <Adafruit_INA219.h>
 
 //sliders
+unsigned int IntervalSliders = 50;
+unsigned long PreviousUpdateSliders = 0;
 const int NUM_SLIDERS = 5;
 const int analogInputs[NUM_SLIDERS] = {A0, A1, A2, A3, A10};
 int analogSliderValues[NUM_SLIDERS];
 
 //buttons
+unsigned int Cooldown = 300;
 const int NUM_BUTTONS = 5;
+unsigned long PreviousUpdateButtons[NUM_BUTTONS] = {0};
 const int buttonPin[NUM_BUTTONS] = {9, 8, 7, 6, 5};
 boolean buttonFlag[NUM_BUTTONS];
 int buttonState[NUM_BUTTONS];
 
-//sensor and reley
+//charger
+unsigned int IntervalCharger = 200;
+unsigned long PreviousUpdateCharger = 0;
 const int buttonPinRelay = 16;     // the number of the pushbutton pin
 int buttonStateRelay = 0;         // variable for reading the pushbutton status
 int RelayPin = 15;
 boolean chargeFlag = false;
+boolean stopFlag = false;
 Adafruit_INA219 ina219;
   float voltage_V = 0,shuntVoltage_mV,busVoltage_V;
   float current_mA = 0;
@@ -51,41 +58,60 @@ void setup() {
 ///////////////////////////////////////////////////////////
 
 void loop() {
+  //Serial.println("loop start");
   //sliders
-  updateSliderValues();
-  sendSliderValues();
+  if(millis() >= (PreviousUpdateSliders + IntervalSliders)){
+    updateSliderValues();
+    sendSliderValues();
+    //Serial.println("loop sliders");
+    PreviousUpdateSliders = millis();
+  }
 
   
   //reley and sensor
-  //flag will indicate if charge cycle is started
-  buttonStateRelay = digitalRead(buttonPinRelay);
-  if (buttonStateRelay == HIGH && chargeFlag == false) {
-    digitalWrite(RelayPin, LOW);
-    chargeFlag = true;
-    delay(1000);
-    current_mA = ina219.getCurrent_mA();
-  } else if(buttonStateRelay == HIGH && current_mA < 100){
-    digitalWrite(RelayPin, HIGH);
-  } else if(buttonStateRelay == LOW) {
-    digitalWrite(RelayPin, HIGH);
-    chargeFlag = false;
-  } else{
-    current_mA = ina219.getCurrent_mA();
+  if(millis() >= (PreviousUpdateCharger + IntervalCharger)){
+    buttonStateRelay = digitalRead(buttonPinRelay);
+    if (buttonStateRelay == HIGH && chargeFlag == false) {      //when headphones on and no chargeing cicle started
+      digitalWrite(RelayPin, LOW);                                //start chargeing and start chargeing cicle
+      chargeFlag = true;
+      delay(1000);
+      current_mA = ina219.getCurrent_mA();
+    } else if(buttonStateRelay == HIGH && current_mA < 100){    //when headphones on and current low (charged)
+      current_mA = ina219.getCurrent_mA();
+      if(buttonStateRelay == HIGH && current_mA < 100 && stopFlag == true){
+        digitalWrite(RelayPin, HIGH);                               //stop chargeing
+        stopFlag = false;
+      }
+      stopFlag = true;
+    } else if(buttonStateRelay == LOW) {                        //when headphones off
+      digitalWrite(RelayPin, HIGH);                               //stop chargeing and end chargeing cicle
+      chargeFlag = false;
+    } else{
+      current_mA = ina219.getCurrent_mA();
+      stopFlag = false;
+    }
+    //Serial.println(current_mA);
+    //Serial.println(buttonStateRelay);
+    //Serial.println(chargeFlag);
+    PreviousUpdateCharger = millis();
   }
+
 
 
   //buttons
   //button 1
   buttonState[0] = digitalRead(buttonPin[0]);
   if (buttonState[0] == LOW) {
-    if (buttonFlag[0] == false){
+    if (buttonFlag[0] == false && millis() >= (PreviousUpdateButtons[0] + Cooldown)){
       Keyboard.press(KEY_LEFT_ALT);
       Keyboard.press(KEY_LEFT_CTRL);
       Keyboard.press(KEY_F11);
       buttonFlag[0] = true; 
-      delay(50); Keyboard.releaseAll();
+      Keyboard.releaseAll();
       updateSliderValues();
       sendSliderValues();
+      //Serial.println("button 1");
+      PreviousUpdateButtons[0] = millis();
     }
   } else {
     buttonFlag[0] = false;
@@ -96,13 +122,13 @@ void loop() {
     if (buttonFlag[1] == false){
       Consumer.write(MEDIA_VOL_MUTE);
       buttonFlag[1] = true; 
-      delay(50);
+      //Serial.println("button 2");
     }
   } else {
     buttonFlag[1] = false;
   }
 
-  
+  Serial.println("loop end");
   delay(50);   //it worked good with 10
 }
 
@@ -112,13 +138,15 @@ void loop() {
 
 //sliders
 void updateSliderValues() {
+  //Serial.println("update sliders");
   for (int i = 0; i < NUM_SLIDERS; i++) {
      analogSliderValues[i] = analogRead(analogInputs[i]);
   }
 }
+/*
 void sendSliderValues() {
   String builtString = String("");
-
+  Serial.println("send sliders");
   for (int i = 0; i < NUM_SLIDERS; i++) {
     builtString += String((int)analogSliderValues[i]);
 
@@ -127,4 +155,22 @@ void sendSliderValues() {
     }
   }
   Serial.println(builtString);
+}*/
+
+//test
+void sendSliderValues() {
+  //String builtString = String("");
+  //Serial.println("send sliders");
+  for (int i = 0; i < NUM_SLIDERS; i++) {
+    //builtString += String((int)analogSliderValues[i]);
+    Serial.print(analogSliderValues[i]);
+    if (i < NUM_SLIDERS - 1) {
+      //builtString += String("|");
+      Serial.print("|");
+    }
+    else{
+      Serial.print("\n");
+    }
+  }
+  //Serial.println(builtString);
 }
