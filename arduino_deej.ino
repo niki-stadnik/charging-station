@@ -1,5 +1,5 @@
 //#include "Keyboard.h"
-#include "HID-Project.h"
+//#include "HID-Project.h"
 #include <Wire.h>
 #include <Adafruit_INA219.h>
 
@@ -13,7 +13,7 @@ int analogSliderValues[NUM_SLIDERS];
 //buttons
 unsigned int Cooldown = 300;
 const int NUM_BUTTONS = 5;
-unsigned long PreviousUpdateButtons[NUM_BUTTONS] = {0};
+unsigned long PreviousUpdateButtons[NUM_BUTTONS]; //mai ne e nulirano !!!
 const int buttonPin[NUM_BUTTONS] = {9, 8, 7, 6, 5};
 boolean buttonFlag[NUM_BUTTONS];
 int buttonState[NUM_BUTTONS];
@@ -48,8 +48,8 @@ void setup() {
   pinMode(RelayPin, OUTPUT);
   
   Serial.begin(9600);
-  Consumer.begin();
-  Keyboard.begin();
+  //Consumer.begin();
+  //Keyboard.begin();
   
   uint32_t currentFrequency;
   ina219.begin();
@@ -58,17 +58,15 @@ void setup() {
 ///////////////////////////////////////////////////////////
 
 void loop() {
-  //Serial.println("loop start");
   //sliders
-  if(millis() >= (PreviousUpdateSliders + IntervalSliders)){
+//  if(millis() >= (PreviousUpdateSliders + IntervalSliders)){
     updateSliderValues();
     sendSliderValues();
-    //Serial.println("loop sliders");
-    PreviousUpdateSliders = millis();
-  }
+  //  PreviousUpdateSliders = millis();
+  //}
 
-  
-  //reley and sensor
+  /*
+  //Charger
   if(millis() >= (PreviousUpdateCharger + IntervalCharger)){
     buttonStateRelay = digitalRead(buttonPinRelay);
     if (buttonStateRelay == HIGH && chargeFlag == false) {      //when headphones on and no chargeing cicle started
@@ -110,7 +108,6 @@ void loop() {
       Keyboard.releaseAll();
       updateSliderValues();
       sendSliderValues();
-      //Serial.println("button 1");
       PreviousUpdateButtons[0] = millis();
     }
   } else {
@@ -120,15 +117,13 @@ void loop() {
   buttonState[1] = digitalRead(buttonPin[1]);
   if (buttonState[1] == LOW) {
     if (buttonFlag[1] == false){
-      Consumer.write(MEDIA_VOL_MUTE);
+      //Consumer.write(MEDIA_VOL_MUTE);
       buttonFlag[1] = true; 
-      //Serial.println("button 2");
     }
   } else {
     buttonFlag[1] = false;
   }
-
-  Serial.println("loop end");
+*/
   delay(50);   //it worked good with 10
 }
 
@@ -137,16 +132,24 @@ void loop() {
 
 
 //sliders
+/*
 void updateSliderValues() {
-  //Serial.println("update sliders");
   for (int i = 0; i < NUM_SLIDERS; i++) {
      analogSliderValues[i] = analogRead(analogInputs[i]);
   }
+}*/
+
+void updateSliderValues() {
+  analogSliderValues[0] = analogRead(analogInputs[0]);
+  analogSliderValues[1] = analogRead(analogInputs[1]);
+  analogSliderValues[2] = analogRead(analogInputs[2]);
+  analogSliderValues[3] = analogRead(analogInputs[3]);
+  analogSliderValues[4] = analogRead(analogInputs[4]);
 }
+
 /*
 void sendSliderValues() {
   String builtString = String("");
-  Serial.println("send sliders");
   for (int i = 0; i < NUM_SLIDERS; i++) {
     builtString += String((int)analogSliderValues[i]);
 
@@ -158,19 +161,42 @@ void sendSliderValues() {
 }*/
 
 //test
+
 void sendSliderValues() {
-  //String builtString = String("");
-  //Serial.println("send sliders");
+  String builtString = String("");
+  builtString += String((int)analogSliderValues[0]);
+  builtString += String("|");
+  builtString += String((int)analogSliderValues[1]);
+  builtString += String("|");
+  builtString += String((int)analogSliderValues[2]);
+  builtString += String("|");
+  builtString += String((int)analogSliderValues[3]);
+  builtString += String("|");
+  builtString += String((int)analogSliderValues[4]);
+  Serial.println(builtString);
+}
+/*
+void sendSliderValues() {
   for (int i = 0; i < NUM_SLIDERS; i++) {
-    //builtString += String((int)analogSliderValues[i]);
     Serial.print(analogSliderValues[i]);
     if (i < NUM_SLIDERS - 1) {
-      //builtString += String("|");
       Serial.print("|");
     }
     else{
       Serial.print("\n");
     }
   }
-  //Serial.println(builtString);
-}
+}*/
+/*
+void sendSliderValues() {
+  Serial.print(analogSliderValues[0]);
+  Serial.print("|");
+  Serial.print(analogSliderValues[1]);
+  Serial.print("|");
+  Serial.print(analogSliderValues[2]);
+  Serial.print("|");
+  Serial.print(analogSliderValues[3]);
+  Serial.print("|");
+  Serial.print(analogSliderValues[4]);
+  Serial.print("\n");
+}*/
