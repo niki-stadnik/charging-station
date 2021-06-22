@@ -1,4 +1,4 @@
-//#include "Keyboard.h"
+#include "Keyboard.h"
 //#include "HID-Project.h"
 #include <Wire.h>
 #include <Adafruit_INA219.h>
@@ -49,7 +49,7 @@ void setup() {
   
   Serial.begin(9600);
   //Consumer.begin();
-  //Keyboard.begin();
+  Keyboard.begin();
   
   uint32_t currentFrequency;
   ina219.begin();
@@ -65,7 +65,7 @@ void loop() {
   //  PreviousUpdateSliders = millis();
   //}
 
-  /*
+  
   //Charger
   if(millis() >= (PreviousUpdateCharger + IntervalCharger)){
     buttonStateRelay = digitalRead(buttonPinRelay);
@@ -123,7 +123,7 @@ void loop() {
   } else {
     buttonFlag[1] = false;
   }
-*/
+
   delay(50);   //it worked good with 10
 }
 
@@ -132,22 +132,21 @@ void loop() {
 
 
 //sliders
-/*
 void updateSliderValues() {
   for (int i = 0; i < NUM_SLIDERS; i++) {
      analogSliderValues[i] = analogRead(analogInputs[i]);
   }
-}*/
-
+}
+/*
 void updateSliderValues() {
   analogSliderValues[0] = analogRead(analogInputs[0]);
   analogSliderValues[1] = analogRead(analogInputs[1]);
   analogSliderValues[2] = analogRead(analogInputs[2]);
   analogSliderValues[3] = analogRead(analogInputs[3]);
   analogSliderValues[4] = analogRead(analogInputs[4]);
-}
+}*/
 
-/*
+
 void sendSliderValues() {
   String builtString = String("");
   for (int i = 0; i < NUM_SLIDERS; i++) {
@@ -158,10 +157,10 @@ void sendSliderValues() {
     }
   }
   Serial.println(builtString);
-}*/
+}
 
 //test
-
+/*
 void sendSliderValues() {
   String builtString = String("");
   builtString += String((int)analogSliderValues[0]);
@@ -174,7 +173,7 @@ void sendSliderValues() {
   builtString += String("|");
   builtString += String((int)analogSliderValues[4]);
   Serial.println(builtString);
-}
+}*/
 /*
 void sendSliderValues() {
   for (int i = 0; i < NUM_SLIDERS; i++) {
