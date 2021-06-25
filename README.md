@@ -17,7 +17,7 @@ Slightly simplified the original code to get rid of some buggy interactions.
 
 ## Buttons
 Using the HID-Project library - has a full set of multimedia keys.
-Added the function to switch the default playback device (Speakers to Headphones and vice versa) using [SoundSwitch app](https://github.com/Belphemur/SoundSwitch).
+Added the function to switch the default playback device (Speakers to Headphones and vice versa) with a single press of a button, using [SoundSwitch app](https://github.com/Belphemur/SoundSwitch).
 
 ## Pictures
 <img src="pics/20210112_204133.jpg" width="1200">
