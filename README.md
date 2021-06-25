@@ -16,6 +16,10 @@ When the headphones are put on the station the charge begins. When they are char
 Uses the [deej](https://github.com/omriharel/deej#license) project.
 Slightly simplified the original code to get rid of some buggy interactions.
 
+Quote from the deej readme:
+
+"deej is an open-source hardware volume mixer for Windows and Linux PCs. It lets you use real-life sliders (like a DJ!) to seamlessly control the volumes of different apps (such as your music player, the game you're playing and your voice chat session) without having to stop what you're doing."
+
 ## Buttons
 Using the HID-Project library - has a full set of multimedia keys.
 Added the function to switch the default playback device (Speakers to Headphones and vice versa) with a single press of a button, using [SoundSwitch app](https://github.com/Belphemur/SoundSwitch).
