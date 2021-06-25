@@ -1,22 +1,23 @@
 //#include "Keyboard.h"
 #include "HID-Project.h"
+#include <HID-Settings.h>
 #include <Wire.h>
 #include <Adafruit_INA219.h>
 
+
+
 //sliders
-unsigned int IntervalSliders = 50;
+unsigned int IntervalSliders = 20;
 unsigned long PreviousUpdateSliders = 0;
 const int NUM_SLIDERS = 5;
 const int analogInputs[NUM_SLIDERS] = {A0, A1, A2, A3, A10};
 int analogSliderValues[NUM_SLIDERS];
 
 //buttons
-unsigned int Cooldown = 300;
 const int NUM_BUTTONS = 5;
-unsigned long PreviousUpdateButtons[NUM_BUTTONS];
 const int buttonPin[NUM_BUTTONS] = {9, 8, 7, 6, 5};
-boolean buttonFlag[NUM_BUTTONS];
-int buttonState[NUM_BUTTONS];
+boolean buttonState[NUM_BUTTONS];
+boolean oldButtonState[NUM_BUTTONS];
 
 //charger
 unsigned int IntervalCharger = 200; //how often to check status
@@ -27,7 +28,6 @@ int RelayPin = 15;
 boolean chargeFlag = false;
 boolean stopFlag = false;
 Adafruit_INA219 ina219;
-  //float voltage_V = 0,shuntVoltage_mV,busVoltage_V;
 float current_mA = 0;
 
 ///////////////////////////////////////////////////////////
@@ -36,8 +36,6 @@ void setup() {
   for (int i = 0; i < NUM_SLIDERS; i++) {
     pinMode(analogInputs[i], INPUT);
     pinMode(buttonPin[i], INPUT_PULLUP);
-    buttonFlag[i] = false;
-    PreviousUpdateButtons[i] = 0;
   }
   
   // initialize the pushbutton pin as an input:
@@ -45,9 +43,9 @@ void setup() {
   // Set RelayPin as an output pin
   pinMode(RelayPin, OUTPUT);
   
-  Serial.begin(9600);
-  Consumer.begin();
   Keyboard.begin();
+  Consumer.begin();
+  Serial.begin(9600);
   
   uint32_t currentFrequency;
   ina219.begin();
@@ -62,6 +60,9 @@ void loop() {
     sendSliderValues();
     PreviousUpdateSliders = millis();
   }
+
+  //buttons
+  buttonActions(); 
 
   
   //Charger
@@ -91,102 +92,65 @@ void loop() {
     //Serial.println(chargeFlag);
     PreviousUpdateCharger = millis();
   }
+}
 
+////////////////////////////////////////////////////////////
 
-
-  //buttons
-  /*
-  //button 1
-  buttonState[0] = digitalRead(buttonPin[0]);
-  if (buttonState[0] == LOW) {
-    if (buttonFlag[0] == false && millis() >= (PreviousUpdateButtons[0] + Cooldown)){
-      Keyboard.press(KEY_LEFT_ALT);
-      Keyboard.press(KEY_LEFT_CTRL);
-      Keyboard.press(KEY_F11);
-      buttonFlag[0] = true; 
-      Keyboard.releaseAll();
-      updateSliderValues();
-      sendSliderValues();
-      PreviousUpdateButtons[0] = millis();
-    }
-  } else {
-    buttonFlag[0] = false;
-  }
-  //button 2
-  buttonState[1] = digitalRead(buttonPin[1]);
-  if (buttonState[1] == LOW) {
-    if (buttonFlag[1] == false && millis() >= (PreviousUpdateButtons[1] + Cooldown)){
-      Consumer.write(MEDIA_VOL_MUTE);
-      buttonFlag[1] = true;
-      PreviousUpdateButtons[1] = millis(); 
-    }
-  } else {
-    buttonFlag[1] = false;
-  }
-*/
-
-//test
+void buttonActions(){
   for(int i = 0; i < NUM_BUTTONS; i++){
+    oldButtonState[i]=buttonState[i];
     buttonState[i] = digitalRead(buttonPin[i]);
-    if (buttonState[i] == LOW) {
-      if (buttonFlag[i] == false && millis() >= (PreviousUpdateButtons[i] + Cooldown)){
-        Buttons(i);
-        buttonFlag[i] = true;
-        PreviousUpdateButtons[i] = millis(); 
-      }
-    } else {
-      buttonFlag[i] = false;
-    }
   }
-
-
-
-
-  
-
-  delay(50);   //it worked good with 10
-}
-
-//test
-
-void Buttons(int num) {
-  switch(num){
-    case 0:
-      Keyboard.press(KEY_LEFT_ALT);
-      Keyboard.press(KEY_LEFT_CTRL);
-      Keyboard.press(KEY_F11);
-      delay(10);
-      Keyboard.releaseAll();
-      updateSliderValues();
-      sendSliderValues();
-      break;
-    case 1:
-      Consumer.write(MEDIA_VOL_MUTE);
-      break;
-    case 2:
-      Consumer.write(MEDIA_PLAY_PAUSE);
-      break;
-    case 3:
-      Consumer.write(MEDIA_PREVIOUS);
-      break;
-    case 4:
-      Consumer.write(MEDIA_NEXT);
-      break;
+  if(buttonState[0] == LOW && oldButtonState[0] == HIGH){
+    Keyboard.press(KEY_LEFT_ALT);
+    Keyboard.press(KEY_LEFT_CTRL);
+    Keyboard.press(KEY_F11);
+    Keyboard.releaseAll();
+  }else if(buttonState[0] == HIGH && oldButtonState[0] == LOW){
+    
+    updateSliderValues();
+    analogSliderValues[0] -= 50;
+    analogSliderValues[1] -= 50;
+    analogSliderValues[2] -= 50;
+    analogSliderValues[3] -= 50;
+    analogSliderValues[4] -= 50;
+    sendSliderValues();
+  }
+  if(buttonState[1] == LOW && oldButtonState[1] == HIGH){
+    Consumer.press(MEDIA_VOL_MUTE);
+  }else if(buttonState[1] == HIGH && oldButtonState[1] == LOW){
+    Consumer.release(MEDIA_VOL_MUTE);
+  }
+  if(buttonState[2] == LOW && oldButtonState[2] == HIGH){
+    Consumer.press(MEDIA_PLAY_PAUSE);
+  }else if(buttonState[2] == HIGH && oldButtonState[2] == LOW){
+    Consumer.release(MEDIA_PLAY_PAUSE);
+  }
+  if(buttonState[3] == LOW && oldButtonState[3] == HIGH){
+    Consumer.press(MEDIA_PREVIOUS);
+  }else if(buttonState[3] == HIGH && oldButtonState[3] == LOW){
+    Consumer.release(MEDIA_PREVIOUS);
+  }
+  if(buttonState[4] == LOW && oldButtonState[4] == HIGH){
+    Consumer.press(MEDIA_NEXT);
+  }else if(buttonState[4] == HIGH && oldButtonState[4] == LOW){
+    Consumer.release(MEDIA_NEXT);
   }
 }
+
 
 
 ///////////////////////////////////////////////////////////
 
 
 //sliders
-/*
+
 void updateSliderValues() {
   for (int i = 0; i < NUM_SLIDERS; i++) {
      analogSliderValues[i] = analogRead(analogInputs[i]);
   }
-}*/
-
+}
+/*
 void updateSliderValues() {
   analogSliderValues[0] = analogRead(analogInputs[0]);
   analogSliderValues[1] = analogRead(analogInputs[1]);
@@ -194,8 +158,8 @@ void updateSliderValues() {
   analogSliderValues[3] = analogRead(analogInputs[3]);
   analogSliderValues[4] = analogRead(analogInputs[4]);
 }
+*/
 
-/*
 void sendSliderValues() {
   String builtString = String("");
   for (int i = 0; i < NUM_SLIDERS; i++) {
@@ -206,8 +170,8 @@ void sendSliderValues() {
     }
   }
   Serial.println(builtString);
-}*/
-
+}
+/*
 void sendSliderValues() {
   String builtString = String("");
   builtString += String((int)analogSliderValues[0]);
@@ -220,4 +184,4 @@ void sendSliderValues() {
   builtString += String("|");
   builtString += String((int)analogSliderValues[4]);
   Serial.println(builtString);
-}
+}*/

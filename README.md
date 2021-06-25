@@ -14,8 +14,6 @@ When the headphones are put on the station the charge begins. When they are char
 
 ## Volume control
 Uses the [deej](https://github.com/omriharel/deej#license) project.
-Slightly simplified the original code to get rid of some buggy interactions.
-
 Quote from the deej readme:
 
 "deej is an open-source hardware volume mixer for Windows and Linux PCs. It lets you use real-life sliders (like a DJ!) to seamlessly control the volumes of different apps (such as your music player, the game you're playing and your voice chat session) without having to stop what you're doing."
