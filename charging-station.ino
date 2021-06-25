@@ -13,13 +13,13 @@ int analogSliderValues[NUM_SLIDERS];
 //buttons
 unsigned int Cooldown = 300;
 const int NUM_BUTTONS = 5;
-unsigned long PreviousUpdateButtons[NUM_BUTTONS]; //mai ne e nulirano !!!
+unsigned long PreviousUpdateButtons[NUM_BUTTONS];
 const int buttonPin[NUM_BUTTONS] = {9, 8, 7, 6, 5};
 boolean buttonFlag[NUM_BUTTONS];
 int buttonState[NUM_BUTTONS];
 
 //charger
-unsigned int IntervalCharger = 200;
+unsigned int IntervalCharger = 200; //how often to check status
 unsigned long PreviousUpdateCharger = 0;
 const int buttonPinRelay = 16;     // the number of the pushbutton pin
 int buttonStateRelay = 0;         // variable for reading the pushbutton status
@@ -27,11 +27,8 @@ int RelayPin = 15;
 boolean chargeFlag = false;
 boolean stopFlag = false;
 Adafruit_INA219 ina219;
-  float voltage_V = 0,shuntVoltage_mV,busVoltage_V;
-  float current_mA = 0;
-  float power_mW = 0;
-  float energy_Wh=0;
-  long time_s=0;
+  //float voltage_V = 0,shuntVoltage_mV,busVoltage_V;
+float current_mA = 0;
 
 ///////////////////////////////////////////////////////////
 
@@ -40,6 +37,7 @@ void setup() {
     pinMode(analogInputs[i], INPUT);
     pinMode(buttonPin[i], INPUT_PULLUP);
     buttonFlag[i] = false;
+    PreviousUpdateButtons[i] = 0;
   }
   
   // initialize the pushbutton pin as an input:
@@ -97,6 +95,7 @@ void loop() {
 
 
   //buttons
+  /*
   //button 1
   buttonState[0] = digitalRead(buttonPin[0]);
   if (buttonState[0] == LOW) {
@@ -116,15 +115,64 @@ void loop() {
   //button 2
   buttonState[1] = digitalRead(buttonPin[1]);
   if (buttonState[1] == LOW) {
-    if (buttonFlag[1] == false){
+    if (buttonFlag[1] == false && millis() >= (PreviousUpdateButtons[1] + Cooldown)){
       Consumer.write(MEDIA_VOL_MUTE);
-      buttonFlag[1] = true; 
+      buttonFlag[1] = true;
+      PreviousUpdateButtons[1] = millis(); 
     }
   } else {
     buttonFlag[1] = false;
   }
+*/
+
+//test
+  for(int i = 0; i < NUM_BUTTONS; i++){
+    buttonState[i] = digitalRead(buttonPin[i]);
+    if (buttonState[i] == LOW) {
+      if (buttonFlag[i] == false && millis() >= (PreviousUpdateButtons[i] + Cooldown)){
+        Buttons(i);
+        buttonFlag[i] = true;
+        PreviousUpdateButtons[i] = millis(); 
+      }
+    } else {
+      buttonFlag[i] = false;
+    }
+  }
+
+
+
+
+  
 
   delay(50);   //it worked good with 10
+}
+
+//test
+
+void Buttons(int num) {
+  switch(num){
+    case 0:
+      Keyboard.press(KEY_LEFT_ALT);
+      Keyboard.press(KEY_LEFT_CTRL);
+      Keyboard.press(KEY_F11);
+      delay(10);
+      Keyboard.releaseAll();
+      updateSliderValues();
+      sendSliderValues();
+      break;
+    case 1:
+      Consumer.write(MEDIA_VOL_MUTE);
+      break;
+    case 2:
+      Consumer.write(MEDIA_PLAY_PAUSE);
+      break;
+    case 3:
+      Consumer.write(MEDIA_PREVIOUS);
+      break;
+    case 4:
+      Consumer.write(MEDIA_NEXT);
+      break;
+  }
 }
 
 
