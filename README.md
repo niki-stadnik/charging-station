@@ -1,6 +1,6 @@
 # Charging station
-Features
 
+##Features
 * Smart charging station for wireless headphones
 * PC volume control useing deej
 * Buttons
