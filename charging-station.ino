@@ -38,10 +38,8 @@ void setup() {
     pinMode(buttonPin[i], INPUT_PULLUP);
   }
   
-  // initialize the pushbutton pin as an input:
-  pinMode(buttonPinRelay, INPUT);
-  // Set RelayPin as an output pin
-  pinMode(RelayPin, OUTPUT);
+  pinMode(buttonPinRelay, INPUT);     // initializing the pushbutton pin as an input
+  pinMode(RelayPin, OUTPUT);          // Set RelayPin as an output pin
   
   Keyboard.begin();
   Consumer.begin();
@@ -68,20 +66,20 @@ void loop() {
   //Charger
   if(millis() >= (PreviousUpdateCharger + IntervalCharger)){
     buttonStateRelay = digitalRead(buttonPinRelay);
-    if (buttonStateRelay == HIGH && chargeFlag == false) {      //when headphones on and no chargeing cicle started
-      digitalWrite(RelayPin, LOW);                                //start chargeing and start chargeing cicle
+    if (buttonStateRelay == HIGH && chargeFlag == false) {      //when headphones on and no charging cicle started
+      digitalWrite(RelayPin, LOW);                                //start charging and start charging cicle
       chargeFlag = true;
       delay(1000);
       current_mA = ina219.getCurrent_mA();
     } else if(buttonStateRelay == HIGH && current_mA < 100){    //when headphones on and current low (charged)
       current_mA = ina219.getCurrent_mA();
       if(buttonStateRelay == HIGH && current_mA < 100 && stopFlag == true){
-        digitalWrite(RelayPin, HIGH);                               //stop chargeing
+        digitalWrite(RelayPin, HIGH);                               //stop charging
         stopFlag = false;
       }
       stopFlag = true;
     } else if(buttonStateRelay == LOW) {                        //when headphones off
-      digitalWrite(RelayPin, HIGH);                               //stop chargeing and end chargeing cicle
+      digitalWrite(RelayPin, HIGH);                               //stop charging and end charging cicle
       chargeFlag = false;
     } else{
       current_mA = ina219.getCurrent_mA();
@@ -107,8 +105,7 @@ void buttonActions(){
     Keyboard.press(KEY_F11);
     Keyboard.releaseAll();
   }else if(buttonState[0] == HIGH && oldButtonState[0] == LOW){
-    
-    updateSliderValues();
+    updateSliderValues();                 //updating the volume with lower values so that it will change when device is switched
     analogSliderValues[0] -= 50;
     analogSliderValues[1] -= 50;
     analogSliderValues[2] -= 50;
@@ -164,7 +161,6 @@ void sendSliderValues() {
   String builtString = String("");
   for (int i = 0; i < NUM_SLIDERS; i++) {
     builtString += String((int)analogSliderValues[i]);
-
     if (i < NUM_SLIDERS - 1) {
       builtString += String("|");
     }
