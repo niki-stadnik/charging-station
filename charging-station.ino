@@ -1,5 +1,5 @@
-#include "Keyboard.h"
-//#include "HID-Project.h"
+//#include "Keyboard.h"
+#include "HID-Project.h"
 #include <Wire.h>
 #include <Adafruit_INA219.h>
 
@@ -48,7 +48,7 @@ void setup() {
   pinMode(RelayPin, OUTPUT);
   
   Serial.begin(9600);
-  //Consumer.begin();
+  Consumer.begin();
   Keyboard.begin();
   
   uint32_t currentFrequency;
@@ -59,11 +59,11 @@ void setup() {
 
 void loop() {
   //sliders
-//  if(millis() >= (PreviousUpdateSliders + IntervalSliders)){
+  if(millis() >= (PreviousUpdateSliders + IntervalSliders)){
     updateSliderValues();
     sendSliderValues();
-  //  PreviousUpdateSliders = millis();
-  //}
+    PreviousUpdateSliders = millis();
+  }
 
   
   //Charger
@@ -117,7 +117,7 @@ void loop() {
   buttonState[1] = digitalRead(buttonPin[1]);
   if (buttonState[1] == LOW) {
     if (buttonFlag[1] == false){
-      //Consumer.write(MEDIA_VOL_MUTE);
+      Consumer.write(MEDIA_VOL_MUTE);
       buttonFlag[1] = true; 
     }
   } else {
@@ -160,8 +160,6 @@ void sendSliderValues() {
   Serial.println(builtString);
 }*/
 
-//test
-
 void sendSliderValues() {
   String builtString = String("");
   builtString += String((int)analogSliderValues[0]);
@@ -175,28 +173,3 @@ void sendSliderValues() {
   builtString += String((int)analogSliderValues[4]);
   Serial.println(builtString);
 }
-/*
-void sendSliderValues() {
-  for (int i = 0; i < NUM_SLIDERS; i++) {
-    Serial.print(analogSliderValues[i]);
-    if (i < NUM_SLIDERS - 1) {
-      Serial.print("|");
-    }
-    else{
-      Serial.print("\n");
-    }
-  }
-}*/
-/*
-void sendSliderValues() {
-  Serial.print(analogSliderValues[0]);
-  Serial.print("|");
-  Serial.print(analogSliderValues[1]);
-  Serial.print("|");
-  Serial.print(analogSliderValues[2]);
-  Serial.print("|");
-  Serial.print(analogSliderValues[3]);
-  Serial.print("|");
-  Serial.print(analogSliderValues[4]);
-  Serial.print("\n");
-}*/
