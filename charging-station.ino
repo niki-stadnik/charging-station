@@ -143,13 +143,13 @@ void buttonActions(){
 
 
 //sliders
-
+/*
 void updateSliderValues() {
   for (int i = 0; i < NUM_SLIDERS; i++) {
      analogSliderValues[i] = analogRead(analogInputs[i]);
   }
-}
-/*
+}*/
+
 void updateSliderValues() {
   analogSliderValues[0] = analogRead(analogInputs[0]);
   analogSliderValues[1] = analogRead(analogInputs[1]);
@@ -157,8 +157,8 @@ void updateSliderValues() {
   analogSliderValues[3] = analogRead(analogInputs[3]);
   analogSliderValues[4] = analogRead(analogInputs[4]);
 }
-*/
 
+/*
 void sendSliderValues() {
   String builtString = String("");
   for (int i = 0; i < NUM_SLIDERS; i++) {
@@ -168,8 +168,8 @@ void sendSliderValues() {
     }
   }
   Serial.println(builtString);
-}
-/*
+}*/
+
 void sendSliderValues() {
   String builtString = String("");
   builtString += String((int)analogSliderValues[0]);
@@ -182,4 +182,4 @@ void sendSliderValues() {
   builtString += String("|");
   builtString += String((int)analogSliderValues[4]);
   Serial.println(builtString);
-}*/
+}
