@@ -69,7 +69,7 @@ void loop() {
     if (buttonStateRelay == HIGH && chargeFlag == false) {      //when headphones on and no charging cicle started
       digitalWrite(RelayPin, LOW);                                //start charging and start charging cicle
       chargeFlag = true;
-      delay(1000);
+      delay(3000);
       current_mA = ina219.getCurrent_mA();
     } else if(buttonStateRelay == HIGH && current_mA < 100){    //when headphones on and current low (charged)
       current_mA = ina219.getCurrent_mA();
