@@ -20,13 +20,15 @@ boolean buttonState[NUM_BUTTONS];
 boolean oldButtonState[NUM_BUTTONS];
 
 //charger
+int waitheInterval = 5;     //how long to waithe for the headphones to start chargeing in seconds
 unsigned int IntervalCharger = 200; //how often to check status
+int cicles = waitheInterval*1000/IntervalCharger;
 unsigned long PreviousUpdateCharger = 0;
 const int buttonPinRelay = 16;     // the number of the pushbutton pin
 int buttonStateRelay = 0;         // variable for reading the pushbutton status
 int RelayPin = 15;
 boolean chargeFlag = false;
-boolean stopFlag = false;
+int stopCounter = 0;
 Adafruit_INA219 ina219;
 float current_mA = 0;
 
@@ -69,25 +71,25 @@ void loop() {
     if (buttonStateRelay == HIGH && chargeFlag == false) {      //when headphones on and no charging cicle started
       digitalWrite(RelayPin, LOW);                                //start charging and start charging cicle
       chargeFlag = true;
-      delay(3000);
       current_mA = ina219.getCurrent_mA();
     } else if(buttonStateRelay == HIGH && current_mA < 100){    //when headphones on and current low (charged)
       current_mA = ina219.getCurrent_mA();
-      if(buttonStateRelay == HIGH && current_mA < 100 && stopFlag == true){
+      if(stopCounter > cicles){                                 //cicles is calculated based on the time required
         digitalWrite(RelayPin, HIGH);                               //stop charging
-        stopFlag = false;
+        stopCounter = 0;
       }
-      stopFlag = true;
+      stopCounter++;
     } else if(buttonStateRelay == LOW) {                        //when headphones off
       digitalWrite(RelayPin, HIGH);                               //stop charging and end charging cicle
       chargeFlag = false;
+      stopCounter = 0;
     } else{
       current_mA = ina219.getCurrent_mA();
-      stopFlag = false;
     }
     //Serial.println(current_mA);
     //Serial.println(buttonStateRelay);
     //Serial.println(chargeFlag);
+    //Serial.println(stopCounter);
     PreviousUpdateCharger = millis();
   }
 }
