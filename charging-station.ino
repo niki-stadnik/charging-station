@@ -1,6 +1,6 @@
 //#include "Keyboard.h"
-#include "HID-Project.h"
-#include <HID-Settings.h>
+//#include "HID-Project.h"
+//#include <HID-Settings.h>
 #include <Wire.h>
 #include <Adafruit_INA219.h>
 
@@ -43,8 +43,8 @@ void setup() {
   pinMode(buttonPinRelay, INPUT);     // initializing the pushbutton pin as an input
   pinMode(RelayPin, OUTPUT);          // Set RelayPin as an output pin
   
-  Keyboard.begin();
-  Consumer.begin();
+//  Keyboard.begin();
+//  Consumer.begin();
   Serial.begin(9600);
   
   uint32_t currentFrequency;
@@ -62,7 +62,7 @@ void loop() {
   }
 
   //buttons
-  buttonActions(); 
+  //buttonActions(); 
 
   
   //Charger
@@ -95,7 +95,7 @@ void loop() {
 }
 
 ////////////////////////////////////////////////////////////
-
+/*
 void buttonActions(){
   for(int i = 0; i < NUM_BUTTONS; i++){
     oldButtonState[i]=buttonState[i];
@@ -137,7 +137,7 @@ void buttonActions(){
   }
 }
 
-
+*/
 
 ///////////////////////////////////////////////////////////
 
