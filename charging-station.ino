@@ -43,7 +43,7 @@ void setup() {
   pinMode(buttonPinRelay, INPUT);     // initializing the pushbutton pin as an input
   pinMode(RelayPin, OUTPUT);          // Set RelayPin as an output pin
   
-  Keyboard.begin();
+  //Keyboard.begin();
   Consumer.begin();
   Serial.begin(9600);
   
@@ -62,9 +62,9 @@ void loop() {
   }
 
   //buttons
-  //buttonActions(); 
+  buttonActions(); 
 
-  /*
+
   //Charger
   if(millis() >= (PreviousUpdateCharger + IntervalCharger)){
     buttonStateRelay = digitalRead(buttonPinRelay);
@@ -91,7 +91,7 @@ void loop() {
     //Serial.println(chargeFlag);
     //Serial.println(stopCounter);
     PreviousUpdateCharger = millis();
-  }*/
+  }
 }
 
 ////////////////////////////////////////////////////////////
@@ -102,18 +102,9 @@ void buttonActions(){
     buttonState[i] = digitalRead(buttonPin[i]);
   }
   if(buttonState[0] == LOW && oldButtonState[0] == HIGH){
-    Keyboard.press(KEY_LEFT_ALT);
-    Keyboard.press(KEY_LEFT_CTRL);
-    Keyboard.press(KEY_F11);
-    Keyboard.releaseAll();
+
   }else if(buttonState[0] == HIGH && oldButtonState[0] == LOW){
-    updateSliderValues();                 //updating the volume with lower values so that it will change when device is switched
-    analogSliderValues[0] -= 50;
-    analogSliderValues[1] -= 50;
-    analogSliderValues[2] -= 50;
-    analogSliderValues[3] -= 50;
-    analogSliderValues[4] -= 50;
-    sendSliderValues();
+
   }
   if(buttonState[1] == LOW && oldButtonState[1] == HIGH){
     Consumer.press(MEDIA_VOL_MUTE);
