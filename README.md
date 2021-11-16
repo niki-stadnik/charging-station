@@ -1,5 +1,5 @@
 # Charging station
-When you need a charging station but a simple charging station is boring!
+When you need a charging station but a simple charging station is boring!!
 
 ## Features
 * Smart charging station for wireless headphones
