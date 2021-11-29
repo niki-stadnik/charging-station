@@ -6,6 +6,12 @@
 
 
 
+//buttons
+const int NUM_BUTTONS = 5;
+const int buttonPin[NUM_BUTTONS] = {9, 8, 7, 6, 5};
+boolean buttonState[NUM_BUTTONS];
+boolean oldButtonState[NUM_BUTTONS];
+
 //sliders
 unsigned int IntervalSliders = 20;
 unsigned long PreviousUpdateSliders = 0;
@@ -13,19 +19,13 @@ const int NUM_SLIDERS = 5;
 const int analogInputs[NUM_SLIDERS] = {A0, A1, A2, A3, A10};
 int analogSliderValues[NUM_SLIDERS];
 
-//buttons
-const int NUM_BUTTONS = 5;
-const int buttonPin[NUM_BUTTONS] = {9, 8, 7, 6, 5};
-boolean buttonState[NUM_BUTTONS];
-boolean oldButtonState[NUM_BUTTONS];
-
 //charger
-int waitheInterval = 5;     //how long to waithe for the headphones to start chargeing in seconds
-unsigned int IntervalCharger = 200; //how often to check status
+int waitheInterval = 5;                             //how long to waithe for the headphones to start charging in seconds
+unsigned int IntervalCharger = 200;                 //how often to check status
 int cicles = waitheInterval*1000/IntervalCharger;   //5*1000/200 = 5000/200=25 cicles in 5 seconds
 unsigned long PreviousUpdateCharger = 0;
-const int buttonPinRelay = 16;     // the number of the pushbutton pin
-int buttonStateRelay = 0;         // variable for reading the pushbutton status
+const int buttonPinRelay = 16;                      // the number of the pushbutton pin
+int buttonStateRelay = 0;                           // variable for reading the pushbutton status
 int RelayPin = 15;
 boolean chargeFlag = false;
 int stopCounter = 0;
@@ -35,7 +35,7 @@ float current_mA = 0;
 ///////////////////////////////////////////////////////////
 
 void setup() { 
-  for (int i = 0; i < NUM_SLIDERS; i++) {
+  for (int i = 0; i < NUM_SLIDERS; i++) {   //doing both buttons and sliders since they are the same number
     pinMode(analogInputs[i], INPUT);
     pinMode(buttonPin[i], INPUT_PULLUP);
   }
@@ -54,15 +54,16 @@ void setup() {
 ///////////////////////////////////////////////////////////
 
 void loop() {
+  //buttons
+  buttonActions(); 
+
+  
   //sliders
   if(millis() >= (PreviousUpdateSliders + IntervalSliders)){
     updateSliderValues();
     sendSliderValues();
     PreviousUpdateSliders = millis();
   }
-
-  //buttons
-  buttonActions(); 
 
 
   //Charger
