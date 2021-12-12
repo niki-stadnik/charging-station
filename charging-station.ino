@@ -31,6 +31,7 @@ boolean chargeFlag = false;
 int stopCounter = 0;
 Adafruit_INA219 ina219;
 float current_mA = 0;
+unsigned long chargedTime = 0;                      //saves the moment the charging started
 
 ///////////////////////////////////////////////////////////
 
@@ -99,10 +100,14 @@ void loop() {
     buttonStateRelay = digitalRead(buttonPinRelay);
     current_mA = ina219.getCurrent_mA();
     if (buttonStateRelay == HIGH && chargeFlag == true){  //headphones on and charging cicle started
-      if(current_mA < 100){                               //when headphones on and current low (charged)
+      if(current_mA < 50){                               //when headphones on and current low (charged)
         if(stopCounter > cicles){                         //cicles is calculated based on the time required
           digitalWrite(RelayPin, HIGH);                   //stop charging
           stopCounter = 0;
+          if(millis() <= (chargedTime + 15000)){
+            delay(500);
+            digitalWrite(RelayPin, LOW);
+          }
         }
         stopCounter++;
       }else{
@@ -116,6 +121,7 @@ void loop() {
       digitalWrite(RelayPin, LOW);                        //start charging and start charging cicle
       chargeFlag = true;
       current_mA = ina219.getCurrent_mA();
+      chargedTime = millis();
     }
     //Serial.println(current_mA);
     //Serial.println(buttonStateRelay);
