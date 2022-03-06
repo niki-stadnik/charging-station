@@ -100,14 +100,16 @@ void loop() {
     buttonStateRelay = digitalRead(buttonPinRelay);
     current_mA = ina219.getCurrent_mA();
     if (buttonStateRelay == HIGH && chargeFlag == true){  //headphones on and charging cicle started
-      if(current_mA < 50){                               //when headphones on and current low (charged)
+      if(current_mA < 39){                               //when headphones on and current low (charged) //35 is too low //40 is too much //37 stops at 85%
         if(stopCounter > cicles){                         //cicles is calculated based on the time required
           digitalWrite(RelayPin, HIGH);                   //stop charging
           stopCounter = 0;
-          if(millis() <= (chargedTime + 15000)){
+          /*
+          if(millis() <= (chargedTime + 15000)){    //that was for auto reset 
             delay(500);
             digitalWrite(RelayPin, LOW);
           }
+          */
         }
         stopCounter++;
       }else{
